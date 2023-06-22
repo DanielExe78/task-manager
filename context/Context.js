@@ -14,6 +14,8 @@ export const AppProvider = ({ children }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showSubtask, setShowSubtask] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [addingSub, setAddingSub] = useState(false);
+  const [subValue, setSubValue] = useState([]);
   const [editingTask, setEditingTask] = useState([]);
   const [location, setLocation] = useState("");
   const [page, setPage] = useState({ client: "", info: [] });
@@ -101,7 +103,49 @@ export const AppProvider = ({ children }) => {
     setSingleTask(
       singleTask.map((clientTask) => {
         if (clientTask === curInfo) {
-          return { ...clientTask, info: [...curInfo.info, task] };
+          return { ...clientTask, info: [...curInfo.info, { ...task }] };
+        } else {
+          return clientTask;
+        }
+      })
+    );
+    setIsSubmenuOpen(!isSubmenuOpen);
+  };
+
+  const addedSubTask = (task) => {
+    const curInfo = singleTask.find((item) => item.info === page.info);
+    const assignedTasks = curInfo.info
+      .flatMap((tasks) => tasks)
+      .filter((specific) => specific.task === submenuPage.task);
+    const remainingTasks = submenuPage.subtask.map((sub) => sub);
+
+    setSingleTask(
+      singleTask.map((clientTask) => {
+        if (clientTask === curInfo && clientTask.info.length > 1) {
+          const unmodifiedVal = curInfo.info.find(
+            (val) => val.id !== assignedTasks[0].id
+          );
+
+          return {
+            ...clientTask,
+            info: [
+              unmodifiedVal,
+              {
+                ...assignedTasks[0],
+                subtask: [...remainingTasks, { ...task.subtask[0] }],
+              },
+            ],
+          };
+        } else if (clientTask === curInfo) {
+          return {
+            ...clientTask,
+            info: [
+              {
+                ...assignedTasks[0],
+                subtask: [...remainingTasks, { ...task.subtask[0] }],
+              },
+            ],
+          };
         } else {
           return clientTask;
         }
@@ -111,29 +155,91 @@ export const AppProvider = ({ children }) => {
   };
 
   const editSingleSubTask = (task) => {
-    const idToReplace = task.subtask.map((replace) => {
-      return replace.id;
-    });
+    const curInfo = singleTask.find((item) => item.info === page.info);
 
-    const replaceTask = singleTask.find((item) => {
-      const { info } = item;
-      info.map((each) => {
-        const { subtask } = each;
-        const match = subtask.find((specific) => {
-          return specific.id === idToReplace[0];
-        });
-
-        setSingleTask(
-          singleTask.map((finalTask) => {
-            if (finalTask === replaceTask) {
-              return { ...finalTask, info: [replaceTask] };
-            } else {
-              return finalTask;
-            }
-          })
-        );
+    const specificSub = curInfo.info
+      .map((specific) => specific.subtask)
+      .filter((each) => {
+        return each.id !== task.subtask[0].id;
       });
-    });
+
+    const differentSub = curInfo.info
+      .flatMap((specific) => specific.subtask)
+      .find((each) => each.id === task.subtask[0].id);
+
+    setSingleTask(
+      singleTask.map((finalTask) => {
+        const { info } = finalTask;
+        const unique = info.find((ala) => ala.task === submenuPage.task);
+        const match = curInfo.info
+          .map((each) => each)
+          .find((a) => a === unique);
+        const index = finalTask.info.indexOf(match);
+
+        if (finalTask.info === curInfo.info && specificSub) {
+          const test = finalTask.info.filter((a) => a !== match);
+          const subIndex = specificSub[index]
+            .flatMap((each) => each)
+            .filter((each) => each !== differentSub);
+
+          return {
+            ...finalTask,
+            info: [
+              ...test,
+              {
+                ...finalTask.info[index],
+                subtask: [...subIndex, { ...task.subtask[0] }],
+              },
+            ],
+          };
+        } else if (finalTask === curInfo) {
+          return {
+            ...finalTask,
+            info: [
+              {
+                ...finalTask.info[index],
+                subtask: [{ ...task.subtask[0] }],
+              },
+            ],
+          };
+        } else {
+          return finalTask;
+        }
+      })
+    );
+    setIsSubmenuOpen(!isSubmenuOpen);
+  };
+
+  const deleteSingletTask = (id) => {
+    const curInfo = singleTask.filter((client) => client.info === page.info);
+    const assignedTasks = curInfo
+      .flatMap((tasks) => tasks.info)
+      .filter((each) => each !== submenuPage);
+    const remainingTasks = submenuPage.subtask
+      .map((sub) => sub)
+      .filter((remain) => remain.id !== id);
+
+    setSingleTask(
+      singleTask.map((finalTask) => {
+        const { info } = finalTask;
+        if (info === curInfo[0].info) {
+          return {
+            ...finalTask,
+            info: [
+              ...assignedTasks,
+              {
+                ...submenuPage,
+                subtask: [...remainingTasks],
+              },
+            ],
+          };
+        } else {
+          return finalTask;
+        }
+      })
+    );
+    setShowSubtask(!showSubtask);
+    setIsSubmenuOpen(!isSubmenuOpen);
   };
 
   const openSubmenu = (text, location) => {
@@ -187,6 +293,12 @@ export const AppProvider = ({ children }) => {
         editingTask,
         editBtn,
         editSingleSubTask,
+        deleteSingletTask,
+        addingSub,
+        setAddingSub,
+        subValue,
+        setSubValue,
+        addedSubTask,
       }}
     >
       {children}

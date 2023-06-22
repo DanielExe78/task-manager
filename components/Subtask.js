@@ -1,16 +1,24 @@
 import React from "react";
 import { useGlobalContext } from "../context/Context";
 import { BiEdit } from "react-icons/bi";
+import { TiDelete } from "react-icons/ti";
 
 const Subtask = () => {
   const {
     showSubtask,
     editBtn,
+    deleteSingletTask,
+    addingSub,
+    setAddingSub,
     submenuPage: { subtask },
   } = useGlobalContext();
 
-  const handleClick = (id) => {
+  const handleEdit = (id) => {
     editBtn(id);
+  };
+
+  const handleDelete = (id) => {
+    deleteSingletTask(id);
   };
 
   return (
@@ -22,12 +30,21 @@ const Subtask = () => {
             return (
               <div className="flex gap-2" key={id}>
                 <li>{sub}</li>
-                <button onClick={() => handleClick(id)}>
+                <button onClick={() => handleDelete(id)}>
+                  <TiDelete className="fill-red-800" />
+                </button>
+                <button onClick={() => handleEdit(id)}>
                   <BiEdit />
                 </button>
               </div>
             );
           })}
+          <button
+            onClick={() => setAddingSub(!addingSub)}
+            className="focus:outline-none uppercase text-white bg-purple-400 hover:bg-purple-600 rounded-lg text-sm px-5 py-2.5 mt-4 dark:hover:bg-purple-600"
+          >
+            ADD SUBTASK
+          </button>
         </ul>
       )}
     </section>

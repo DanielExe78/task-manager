@@ -1,18 +1,15 @@
 import React, { useState } from "react";
 import { useGlobalContext } from "../context/Context";
+import { v4 as uuidv4 } from "uuid";
 
-const EditSubTask = () => {
-  const {
-    setIsModalOpen,
-    editSingleSubTask,
-    setShowSubtask,
-    editingTask,
-    setIsEditing,
-  } = useGlobalContext();
-  const [editSubTask, setEditSubTasks] = useState([
+const AddSubTask = () => {
+  const { setAddingSub, addedSubTask, setShowSubtask } = useGlobalContext();
+
+  const [addSubTask, setAddSubTask] = useState([
     {
       subtask: [
         {
+          id: uuidv4(),
           sub: "",
         },
       ],
@@ -21,34 +18,30 @@ const EditSubTask = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (editSubTask.subtask) {
+    if (addSubTask.subtask) {
       const newTask = {
-        ...editSubTask,
-        subtask: editSubTask.subtask,
+        ...addSubTask,
+        subtask: addSubTask.subtask,
       };
 
-      editSingleSubTask(newTask);
+      addedSubTask(newTask);
       setShowSubtask(false);
-      setIsEditing(false);
-      setIsModalOpen(false);
+      setAddingSub(false);
     }
   };
 
   const handleChange = (e) => {
     let name = e.target.name;
     let value = e.target.value;
-    editingTask.map((item) => {
-      const { id } = item;
 
-      setEditSubTasks({
-        ...editSubTask,
-        subtask: [
-          {
-            id,
-            [name]: value,
-          },
-        ],
-      });
+    setAddSubTask({
+      ...addSubTask,
+      subtask: [
+        {
+          id: uuidv4(),
+          [name]: value,
+        },
+      ],
     });
   };
 
@@ -68,10 +61,10 @@ const EditSubTask = () => {
         className="rounded bg-cyan-400 uppercase inline-block shadow-black hover:bg-cyan-500 p-1 mt-1 w-fit self-center"
         onClick={handleSubmit}
       >
-        edit
+        add
       </button>
     </form>
   );
 };
 
-export default EditSubTask;
+export default AddSubTask;

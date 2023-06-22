@@ -4,10 +4,17 @@ import Submenu from "../../components/Submenu";
 import FormComponent from "../../components/FormComponent";
 import { useEffect, useRef } from "react";
 import EditSubTask from "../../components/EditSubTask";
+import AddSubTask from "../../components/AddSubTask";
 
 export default function Home() {
-  const { openSubmenu, isModalOpen, singleTask, location, isEditing } =
-    useGlobalContext();
+  const {
+    openSubmenu,
+    isModalOpen,
+    singleTask,
+    location,
+    isEditing,
+    addingSub,
+  } = useGlobalContext();
   const container = useRef(null);
 
   useEffect(() => {
@@ -48,6 +55,11 @@ export default function Home() {
       {isEditing && (
         <article className="absolute w-screen flex justify-center items-center backdrop-brightness-50 h-screen left-0 top-0">
           <EditSubTask />
+        </article>
+      )}
+      {addingSub && (
+        <article className="absolute w-screen flex justify-center items-center backdrop-brightness-50 h-screen left-0 top-0">
+          <AddSubTask />
         </article>
       )}
     </section>
