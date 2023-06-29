@@ -13,29 +13,38 @@ export const AppProvider = ({ children }) => {
   const [isSubmenuOpen, setIsSubmenuOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showSubtask, setShowSubtask] = useState(false);
+  const [showTask, setShowTask] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [addingSub, setAddingSub] = useState(false);
   const [subValue, setSubValue] = useState([]);
   const [editingTask, setEditingTask] = useState([]);
   const [location, setLocation] = useState("");
   const [page, setPage] = useState({ client: "", info: [] });
-  const [submenuPage, setSubmenuPage] = useState({ task: "", subtask: [] });
+  const [submenuPage, setSubmenuPage] = useState({
+    department: "",
+    depTasks: [],
+  });
   const [singleTask, setSingleTask] = useState([
     {
       client: "PKC",
       info: [
         {
-          id: uuidv4(),
           department: "HR",
-          task: "task 1",
-          subtask: [
+          id: uuidv4(),
+          depTasks: [
             {
               id: uuidv4(),
-              sub: "generic task 1",
-            },
-            {
-              id: uuidv4(),
-              sub: "generic task 2",
+              task: "task 1",
+              subtask: [
+                {
+                  id: uuidv4(),
+                  sub: "generic task 1",
+                },
+                {
+                  id: uuidv4(),
+                  sub: "generic task 2",
+                },
+              ],
             },
           ],
         },
@@ -45,17 +54,23 @@ export const AppProvider = ({ children }) => {
       client: "PGA",
       info: [
         {
-          id: uuidv4(),
           department: "HR",
-          task: "task 2",
-          subtask: [
+          id: uuidv4(),
+          depTasks: [
             {
               id: uuidv4(),
-              sub: "generic task 3",
-            },
-            {
-              id: uuidv4(),
-              sub: "generic task 4",
+
+              task: "task 2",
+              subtask: [
+                {
+                  id: uuidv4(),
+                  sub: "generic task 3",
+                },
+                {
+                  id: uuidv4(),
+                  sub: "generic task 4",
+                },
+              ],
             },
           ],
         },
@@ -65,32 +80,42 @@ export const AppProvider = ({ children }) => {
       client: "GOOGLE",
       info: [
         {
-          id: uuidv4(),
           department: "HR",
-          task: "task 3",
-          subtask: [
+          id: uuidv4(),
+          depTasks: [
             {
               id: uuidv4(),
-              sub: "generic task 5",
-            },
-            {
-              id: uuidv4(),
-              sub: "generic task 6",
+              task: "task 3",
+              subtask: [
+                {
+                  id: uuidv4(),
+                  sub: "generic task 5",
+                },
+                {
+                  id: uuidv4(),
+                  sub: "generic task 6",
+                },
+              ],
             },
           ],
         },
         {
+          department: "PRODUCT",
           id: uuidv4(),
-          department: "HR",
-          task: "task 4",
-          subtask: [
+          depTasks: [
             {
               id: uuidv4(),
-              sub: "generic task 7",
-            },
-            {
-              id: uuidv4(),
-              sub: "generic task 8",
+              task: "task 4",
+              subtask: [
+                {
+                  id: uuidv4(),
+                  sub: "generic task 7",
+                },
+                {
+                  id: uuidv4(),
+                  sub: "generic task 8",
+                },
+              ],
             },
           ],
         },
@@ -253,9 +278,11 @@ export const AppProvider = ({ children }) => {
     const subPage = singleTask
       .map((task) => {
         const { info } = task;
-        return info.find((val) => val.task === textBtn);
+        console.log(info);
+        return info.find((val) => val.department === textBtn);
       })
       .filter((value) => typeof value !== "undefined");
+
     setSubmenuPage(...subPage);
   };
 
@@ -299,6 +326,8 @@ export const AppProvider = ({ children }) => {
         subValue,
         setSubValue,
         addedSubTask,
+        showTask,
+        setShowTask,
       }}
     >
       {children}
