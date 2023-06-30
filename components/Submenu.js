@@ -18,9 +18,8 @@ const Submenu = () => {
     const text = e.target.textContent;
     const tempBtn = e.target.getBoundingClientRect();
     const center = (tempBtn.bottom + tempBtn.top) / 2;
-    const id = e.target;
-    console.log(id, "id");
-    openSubtaskMenu(text, center);
+    const id = e.currentTarget.id;
+    openSubtaskMenu(text, id);
     setShowTask(!showTask);
   };
 
@@ -34,6 +33,7 @@ const Submenu = () => {
               return (
                 <button
                   key={id}
+                  id={id}
                   className="bg-[#FFFFFF] text-black rounded"
                   onClick={displaySubTask}
                 >

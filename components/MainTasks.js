@@ -10,6 +10,9 @@ const MainTasks = () => {
     showTask,
     setShowTask,
     openSubtaskMenu,
+    showSubtask,
+    setShowSubtask,
+    depSubtasks,
     submenuPage: { depTasks },
   } = useGlobalContext();
 
@@ -17,11 +20,10 @@ const MainTasks = () => {
     const text = e.target.textContent;
     const tempBtn = e.target.getBoundingClientRect();
     const center = (tempBtn.bottom + tempBtn.top) / 2;
-    openSubtaskMenu(text, center);
-    setShowTask(!showTask);
-  };
 
-  console.log(depTasks);
+    depSubtasks(text);
+    setShowSubtask(!showSubtask);
+  };
 
   return (
     <>
@@ -39,7 +41,7 @@ const MainTasks = () => {
               </button>
             );
           })}
-          <section className="absolute left-40 bottom-0">
+          <section className="absolute left-48 bottom-0">
             <Subtask />
           </section>
           <button

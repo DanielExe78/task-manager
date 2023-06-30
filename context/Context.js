@@ -24,6 +24,10 @@ export const AppProvider = ({ children }) => {
     department: "",
     depTasks: [],
   });
+  const [depSubTask, setDepSubTask] = useState({
+    task: "",
+    subtask: [],
+  });
   const [singleTask, setSingleTask] = useState([
     {
       client: "PKC",
@@ -274,16 +278,31 @@ export const AppProvider = ({ children }) => {
     setIsSubmenuOpen(!isSubmenuOpen);
   };
 
-  const openSubtaskMenu = (textBtn) => {
+  const openSubtaskMenu = (textBtn, id) => {
     const subPage = singleTask
       .map((task) => {
         const { info } = task;
-        console.log(info);
-        return info.find((val) => val.department === textBtn);
+
+        return info.find((val) => val.id === id);
       })
       .filter((value) => typeof value !== "undefined");
 
     setSubmenuPage(...subPage);
+  };
+
+  const depSubtasks = (textBtn) => {
+    const subPage = singleTask
+      .map((task) => {
+        const { info } = task;
+        return info.flatMap((val) => {
+          const { depTasks } = val;
+          return depTasks.filter((each) => each.task === textBtn);
+        });
+      })
+      .filter((value) => value.length > 0)
+      .flat();
+
+    setDepSubTask(...subPage);
   };
 
   const editBtn = (id) => {
@@ -328,6 +347,9 @@ export const AppProvider = ({ children }) => {
         addedSubTask,
         showTask,
         setShowTask,
+        depSubtasks,
+        depSubTask,
+        setDepSubTask,
       }}
     >
       {children}

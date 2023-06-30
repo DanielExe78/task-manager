@@ -10,16 +10,14 @@ const Subtask = () => {
     deleteSingletTask,
     addingSub,
     setAddingSub,
-    submenuPage: { depTasks },
+    depSubTask: { subtask },
   } = useGlobalContext();
-
-  // console.log(depTasks);
 
   return (
     <section>
       {showSubtask && (
         <ul className="bg-[#EAEAEA] rounded p-5 w-max relative bottom-10">
-          {depTasks.map((item) => {
+          {subtask.map((item) => {
             const { id, sub } = item;
             return (
               <div className="flex gap-2" key={id}>
