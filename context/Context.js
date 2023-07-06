@@ -21,11 +21,11 @@ export const AppProvider = ({ children }) => {
   const [location, setLocation] = useState("");
   const [page, setPage] = useState({ client: "", info: [] });
   const [submenuPage, setSubmenuPage] = useState({
-    department: "",
+    task: "",
     depTasks: [],
   });
   const [depSubTask, setDepSubTask] = useState({
-    task: "",
+    department: "",
     subtask: [],
   });
   const [singleTask, setSingleTask] = useState([
@@ -33,12 +33,12 @@ export const AppProvider = ({ children }) => {
       client: "PKC",
       info: [
         {
-          department: "HR",
+          task: "task 1",
           id: uuidv4(),
           depTasks: [
             {
               id: uuidv4(),
-              task: "task 1",
+              department: "HR",
               subtask: [
                 {
                   id: uuidv4(),
@@ -58,13 +58,13 @@ export const AppProvider = ({ children }) => {
       client: "PGA",
       info: [
         {
-          department: "HR",
+          task: "task 2",
           id: uuidv4(),
           depTasks: [
             {
               id: uuidv4(),
 
-              task: "task 2",
+              department: "HR",
               subtask: [
                 {
                   id: uuidv4(),
@@ -84,12 +84,12 @@ export const AppProvider = ({ children }) => {
       client: "GOOGLE",
       info: [
         {
-          department: "HR",
+          task: "task 3",
           id: uuidv4(),
           depTasks: [
             {
               id: uuidv4(),
-              task: "task 3",
+              department: "HR",
               subtask: [
                 {
                   id: uuidv4(),
@@ -104,12 +104,12 @@ export const AppProvider = ({ children }) => {
           ],
         },
         {
-          department: "PRODUCT",
+          task: "task 4",
           id: uuidv4(),
           depTasks: [
             {
               id: uuidv4(),
-              task: "task 4",
+              department: "PRODUCT",
               subtask: [
                 {
                   id: uuidv4(),
@@ -128,7 +128,8 @@ export const AppProvider = ({ children }) => {
   ]);
 
   const addedTask = (task) => {
-    let curInfo = singleTask.find((item) => item.info === page.info);
+    const curInfo = singleTask.find((item) => item.info === page.info);
+    console.log(task);
     setSingleTask(
       singleTask.map((clientTask) => {
         if (clientTask === curInfo) {
@@ -146,7 +147,7 @@ export const AppProvider = ({ children }) => {
     const assignedTasks = curInfo.info
       .flatMap((tasks) => tasks)
       .filter((specific) => specific.task === submenuPage.task);
-    const remainingTasks = submenuPage.subtask.map((sub) => sub);
+    const remainingTasks = submenuPage.depTasks.map((sub) => sub);
 
     setSingleTask(
       singleTask.map((clientTask) => {
@@ -155,13 +156,25 @@ export const AppProvider = ({ children }) => {
             (val) => val.id !== assignedTasks[0].id
           );
 
+          console.log(assignedTasks[0].depTasks[0]);
+          console.log(unmodifiedVal);
+          console.log(remainingTasks);
+
           return {
             ...clientTask,
             info: [
               unmodifiedVal,
               {
                 ...assignedTasks[0],
-                subtask: [...remainingTasks, { ...task.subtask[0] }],
+                depTasks: [
+                  {
+                    ...assignedTasks[0].depTasks[0],
+                    subtask: [
+                      ...remainingTasks[0].subtask,
+                      { ...task.subtask[0] },
+                    ],
+                  },
+                ],
               },
             ],
           };
@@ -187,14 +200,20 @@ export const AppProvider = ({ children }) => {
     const curInfo = singleTask.find((item) => item.info === page.info);
 
     const specificSub = curInfo.info
-      .map((specific) => specific.subtask)
-      .filter((each) => {
-        return each.id !== task.subtask[0].id;
-      });
+      .map((specific) =>
+        specific.depTasks.flatMap((subs) => {
+          return subs;
+        })
+      )
+      .flat();
 
     const differentSub = curInfo.info
-      .flatMap((specific) => specific.subtask)
-      .find((each) => each.id === task.subtask[0].id);
+      .flatMap((specific) =>
+        specific.depTasks.flatMap((each) =>
+          each.subtask.find((sub) => sub.id === task.subtask[0].id)
+        )
+      )
+      .filter((each) => typeof each !== "undefined");
 
     setSingleTask(
       singleTask.map((finalTask) => {
@@ -207,9 +226,16 @@ export const AppProvider = ({ children }) => {
 
         if (finalTask.info === curInfo.info && specificSub) {
           const test = finalTask.info.filter((a) => a !== match);
-          const subIndex = specificSub[index]
-            .flatMap((each) => each)
-            .filter((each) => each !== differentSub);
+          const subIndex = specificSub
+            .map((each) => {
+              return each;
+            })
+            .filter((val) => val === match.depTasks[0])
+            .flatMap((val) => {
+              const { subtask } = val;
+              return subtask.find((del) => del !== differentSub[0]);
+            })
+            .filter((finalVal) => typeof finalVal !== "undefined");
 
           return {
             ...finalTask,
@@ -217,7 +243,12 @@ export const AppProvider = ({ children }) => {
               ...test,
               {
                 ...finalTask.info[index],
-                subtask: [...subIndex, { ...task.subtask[0] }],
+                depTasks: [
+                  {
+                    ...finalTask.info[index].depTasks[0],
+                    subtask: [...subIndex, { ...task.subtask[0] }],
+                  },
+                ],
               },
             ],
           };
@@ -227,7 +258,12 @@ export const AppProvider = ({ children }) => {
             info: [
               {
                 ...finalTask.info[index],
-                subtask: [{ ...task.subtask[0] }],
+                depTasks: [
+                  {
+                    ...finalTask.info[index].depTasks[0],
+                    subtask: [{ ...task.subtask[0] }],
+                  },
+                ],
               },
             ],
           };
@@ -244,9 +280,11 @@ export const AppProvider = ({ children }) => {
     const assignedTasks = curInfo
       .flatMap((tasks) => tasks.info)
       .filter((each) => each !== submenuPage);
-    const remainingTasks = submenuPage.subtask
-      .map((sub) => sub)
+    const remainingTasks = submenuPage.depTasks
+      .flatMap((sub) => sub.subtask)
       .filter((remain) => remain.id !== id);
+
+    console.log(remainingTasks);
 
     setSingleTask(
       singleTask.map((finalTask) => {
@@ -258,7 +296,12 @@ export const AppProvider = ({ children }) => {
               ...assignedTasks,
               {
                 ...submenuPage,
-                subtask: [...remainingTasks],
+                depTasks: [
+                  {
+                    ...submenuPage.depTasks[0],
+                    subtask: [...remainingTasks],
+                  },
+                ],
               },
             ],
           };
@@ -290,17 +333,18 @@ export const AppProvider = ({ children }) => {
     setSubmenuPage(...subPage);
   };
 
-  const depSubtasks = (textBtn) => {
+  const depSubtasks = (id) => {
     const subPage = singleTask
       .map((task) => {
         const { info } = task;
         return info.flatMap((val) => {
           const { depTasks } = val;
-          return depTasks.filter((each) => each.task === textBtn);
+
+          return depTasks.find((dep) => dep.id === id);
         });
       })
-      .filter((value) => value.length > 0)
-      .flat();
+      .flat()
+      .filter((value) => typeof value !== "undefined");
 
     setDepSubTask(...subPage);
   };
@@ -309,8 +353,8 @@ export const AppProvider = ({ children }) => {
     const editVal = singleTask
       .map((task) =>
         task.info.map((item) => {
-          const { subtask } = item;
-          return subtask.find((curId) => curId.id === id);
+          const { depTasks } = item;
+          return depTasks[0].subtask.find((curId) => curId.id === id);
         })
       )
       .flatMap((val) => val)

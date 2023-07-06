@@ -7,11 +7,15 @@ const FormComponent = () => {
   const { setIsModalOpen, addedTask, setShowSubtask } = useGlobalContext();
   const [tasks, setTasks] = useState([
     {
-      department: "",
       task: "",
-      subtask: [
+      depTasks: [
         {
-          sub: "",
+          department: "",
+          subtask: [
+            {
+              sub: "",
+            },
+          ],
         },
       ],
     },
@@ -19,29 +23,60 @@ const FormComponent = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (tasks.task && tasks.department && tasks.subtask) {
+    if (tasks.task) {
       const newTask = {
         ...tasks,
         id: uuidv4(),
-        subtask: [...tasks.subtask],
+        depTasks: [...tasks.depTasks],
       };
       addedTask(newTask);
-      setTasks({ department: "", task: "", subtask: [{}] });
       setShowSubtask(false);
       setIsModalOpen(false);
     }
   };
 
-  const handleChange = (e) => {
+  const handleTask = (e) => {
     let name = e.target.name;
     let value = e.target.value;
+
     setTasks({
       ...tasks,
       [name]: value,
-      subtask: [
+    });
+  };
+
+  const handleDep = (e) => {
+    let name = e.target.name;
+    let value = e.target.value;
+
+    console.log(name, value);
+
+    setTasks({
+      ...tasks,
+      depTasks: [
         {
           id: uuidv4(),
-          sub: value,
+          [name]: value,
+        },
+      ],
+    });
+  };
+
+  const handleSub = (e) => {
+    let name = e.target.name;
+    let value = e.target.value;
+
+    setTasks({
+      ...tasks,
+      depTasks: [
+        {
+          ...tasks.depTasks[0],
+          subtask: [
+            {
+              id: uuidv4(),
+              [name]: value,
+            },
+          ],
         },
       ],
     });
@@ -54,25 +89,27 @@ const FormComponent = () => {
           type="text"
           placeholder="Tarea Principal"
           name="task"
-          onChange={handleChange}
+          onChange={handleTask}
           className="border-b-2 border-b-gray-600 focus:outline-none placeholder:text-slate-400 "
         />
       </div>
+
       <div className="flex flex-col">
         <input
           type="text"
           placeholder="Departamento"
           name="department"
-          onChange={handleChange}
+          onChange={handleDep}
           className="border-b-2 border-b-gray-600 focus:outline-none placeholder:text-slate-400 "
         />
       </div>
+
       <div className="flex flex-col">
         <input
           type="text"
           placeholder="Subtarea"
-          name="subtask"
-          onChange={handleChange}
+          name="sub"
+          onChange={handleSub}
           className="border-b-2 border-b-gray-600 focus:outline-none placeholder:text-slate-400 "
         />
       </div>

@@ -29,7 +29,7 @@ const Submenu = () => {
         <aside className="bg-[#EAEAEA] rounded p-5 relative">
           <ul className="flex flex-col gap-2">
             {info.map((item) => {
-              const { department, id } = item;
+              const { task, id } = item;
               return (
                 <button
                   key={id}
@@ -37,7 +37,7 @@ const Submenu = () => {
                   className="bg-[#FFFFFF] text-black rounded"
                   onClick={displaySubTask}
                 >
-                  <li>{department}</li>
+                  <li>{task}</li>
                 </button>
               );
             })}

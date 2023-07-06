@@ -13,6 +13,14 @@ const Subtask = () => {
     depSubTask: { subtask },
   } = useGlobalContext();
 
+  const handleEdit = (id) => {
+    editBtn(id);
+  };
+
+  const handleDelete = (id) => {
+    deleteSingletTask(id);
+  };
+
   return (
     <section>
       {showSubtask && (
