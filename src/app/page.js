@@ -5,6 +5,7 @@ import FormComponent from "../../components/FormComponent";
 import { useEffect, useRef } from "react";
 import EditSubTask from "../../components/EditSubTask";
 import AddSubTask from "../../components/AddSubTask";
+import AddDep from "../../components/AddDep";
 
 export default function Home() {
   const {
@@ -14,6 +15,7 @@ export default function Home() {
     location,
     isEditing,
     addingSub,
+    addingDep,
   } = useGlobalContext();
   const container = useRef(null);
 
@@ -60,6 +62,11 @@ export default function Home() {
       {addingSub && (
         <article className="absolute w-screen flex justify-center items-center backdrop-brightness-50 h-screen left-0 top-0">
           <AddSubTask />
+        </article>
+      )}
+      {addingDep && (
+        <article className="absolute w-screen flex justify-center items-center backdrop-brightness-50 h-screen left-0 top-0">
+          <AddDep />
         </article>
       )}
     </section>

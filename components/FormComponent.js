@@ -49,8 +49,6 @@ const FormComponent = () => {
     let name = e.target.name;
     let value = e.target.value;
 
-    console.log(name, value);
-
     setTasks({
       ...tasks,
       depTasks: [

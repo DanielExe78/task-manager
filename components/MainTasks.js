@@ -4,14 +4,11 @@ import Subtask from "./Subtask";
 
 const MainTasks = () => {
   const {
-    isSubmenuOpen,
-    isModalOpen,
-    setIsModalOpen,
     showTask,
-    setShowTask,
-    openSubtaskMenu,
     showSubtask,
     setShowSubtask,
+    addingDep,
+    setAddingDep,
     depSubtasks,
     submenuPage: { depTasks },
   } = useGlobalContext();
@@ -46,7 +43,7 @@ const MainTasks = () => {
             <Subtask />
           </section>
           <button
-            onClick={() => setAddingSub(!addingSub)}
+            onClick={() => setAddingDep(!addingDep)}
             className="focus:outline-none uppercase text-white bg-purple-400 hover:bg-purple-600 rounded-lg text-sm px-5 py-2.5 mt-4 dark:hover:bg-purple-600"
           >
             ADD DEPARTMENT

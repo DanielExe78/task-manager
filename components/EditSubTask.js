@@ -21,6 +21,9 @@ const EditSubTask = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    console.log(editSubTask);
+
     if (editSubTask.subtask) {
       const newTask = {
         ...editSubTask,
@@ -37,6 +40,7 @@ const EditSubTask = () => {
   const handleChange = (e) => {
     let name = e.target.name;
     let value = e.target.value;
+
     editingTask.map((item) => {
       const { id } = item;
 

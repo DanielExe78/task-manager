@@ -1,18 +1,20 @@
-import React from "react";
+import React, { useState } from "react";
+import { v4 as uuidv4 } from "uuid";
+import { useGlobalContext } from "../context/Context";
 
 const AddDep = () => {
-  const {
-    setIsModalOpen,
-    editSingleSubTask,
-    setShowSubtask,
-    editingTask,
-    setIsEditing,
-  } = useGlobalContext();
+  const { setIsModalOpen, setShowSubtask, addDep, addingDep, setAddingDep } =
+    useGlobalContext();
   const [addDepartment, setAddDepartment] = useState([
     {
       depTasks: [
         {
           department: "",
+          subtask: [
+            {
+              sub: "",
+            },
+          ],
         },
       ],
     },
@@ -20,34 +22,45 @@ const AddDep = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (editSubTask.subtask) {
-      const newDep = {
-        ...editSubTask,
-        subtask: editSubTask.subtask,
-      };
 
-      editSingleSubTask(newDep);
-      setShowSubtask(false);
-      setIsEditing(false);
-      setIsModalOpen(false);
-    }
+    const newDep = {
+      ...addDepartment.depTasks[0],
+      subtask: [{ ...addDepartment.subtask[0] }],
+    };
+
+    addDep(newDep);
+    setShowSubtask(false);
+    setIsModalOpen(false);
+    setAddingDep(false);
   };
 
-  const handleChange = (e) => {
+  const handleDep = (e) => {
     let name = e.target.name;
     let value = e.target.value;
-    editingTask.map((item) => {
-      const { id } = item;
 
-      setAddDepartment({
-        ...addDepartment,
-        depTasks: [
-          {
-            id,
-            [name]: value,
-          },
-        ],
-      });
+    setAddDepartment({
+      ...addDepartment,
+      depTasks: [
+        {
+          id: uuidv4(),
+          [name]: value,
+        },
+      ],
+    });
+  };
+
+  const handleSub = (e) => {
+    let name = e.target.name;
+    let value = e.target.value;
+
+    setAddDepartment({
+      ...addDepartment,
+      subtask: [
+        {
+          id: uuidv4(),
+          [name]: value,
+        },
+      ],
     });
   };
 
@@ -58,14 +71,14 @@ const AddDep = () => {
           type="text"
           placeholder="Departamento"
           name="department"
-          onChange={handleChange}
+          onChange={handleDep}
           className="border-b-2 border-b-gray-600 focus:outline-none placeholder:text-slate-400 "
         />
         <input
           type="text"
           placeholder="Subtarea"
           name="sub"
-          onChange={handleChange}
+          onChange={handleSub}
           className="border-b-2 border-b-gray-600 focus:outline-none placeholder:text-slate-400 "
         />
       </div>
@@ -74,7 +87,7 @@ const AddDep = () => {
         className="rounded bg-cyan-400 uppercase inline-block shadow-black hover:bg-cyan-500 p-1 mt-1 w-fit self-center"
         onClick={handleSubmit}
       >
-        edit
+        ADD
       </button>
     </form>
   );

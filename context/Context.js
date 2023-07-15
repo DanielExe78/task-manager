@@ -16,6 +16,7 @@ export const AppProvider = ({ children }) => {
   const [showTask, setShowTask] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [addingSub, setAddingSub] = useState(false);
+  const [addingDep, setAddingDep] = useState(false);
   const [subValue, setSubValue] = useState([]);
   const [editingTask, setEditingTask] = useState([]);
   const [location, setLocation] = useState("");
@@ -63,7 +64,6 @@ export const AppProvider = ({ children }) => {
           depTasks: [
             {
               id: uuidv4(),
-
               department: "HR",
               subtask: [
                 {
@@ -121,6 +121,16 @@ export const AppProvider = ({ children }) => {
                 },
               ],
             },
+            {
+              id: uuidv4(),
+              department: "GENERIC DEP",
+              subtask: [
+                {
+                  id: uuidv4(),
+                  sub: "generic task 9",
+                },
+              ],
+            },
           ],
         },
       ],
@@ -129,7 +139,6 @@ export const AppProvider = ({ children }) => {
 
   const addedTask = (task) => {
     const curInfo = singleTask.find((item) => item.info === page.info);
-    console.log(task);
     setSingleTask(
       singleTask.map((clientTask) => {
         if (clientTask === curInfo) {
@@ -140,6 +149,49 @@ export const AppProvider = ({ children }) => {
       })
     );
     setIsSubmenuOpen(!isSubmenuOpen);
+  };
+
+  const addDep = (task) => {
+    const curInfo = singleTask.find((item) => item.info === page.info);
+    const prevInfo = curInfo.info.flatMap((info) => info.depTasks);
+    const assignedTasks = curInfo.info
+      .flatMap((tasks) => tasks)
+      .filter((specific) => specific.task === submenuPage.task);
+
+    setSingleTask(
+      singleTask.map((newDep) => {
+        const unmodifiedVal = curInfo.info.find(
+          (val) => val.id !== assignedTasks[0].id
+        );
+
+        if (newDep.info === curInfo.info && newDep.info.length > 1) {
+          return {
+            ...newDep,
+            info: [
+              unmodifiedVal,
+              {
+                ...assignedTasks[0],
+                depTasks: [...assignedTasks[0].depTasks, { ...task }],
+              },
+            ],
+          };
+        } else if (newDep.info === curInfo.info) {
+          return {
+            ...newDep,
+            info: [
+              {
+                ...assignedTasks[0],
+                depTasks: [...assignedTasks[0].depTasks, { ...task }],
+              },
+            ],
+          };
+        } else {
+          return newDep;
+        }
+      })
+    );
+    setIsSubmenuOpen(!isSubmenuOpen);
+    setShowTask(false);
   };
 
   const addedSubTask = (task) => {
@@ -156,9 +208,19 @@ export const AppProvider = ({ children }) => {
             (val) => val.id !== assignedTasks[0].id
           );
 
-          console.log(assignedTasks[0].depTasks[0]);
-          console.log(unmodifiedVal);
-          console.log(remainingTasks);
+          const prevDep = assignedTasks.flatMap((val) => {
+            const { depTasks } = val;
+            return depTasks.filter((each) => each.id !== depSubTask.id);
+          });
+
+          // console.log(unmodifiedVal);
+          // console.log(remainingTasks);
+          // console.log(remainingTasks[0]);
+          // console.log(remainingTasks[1]);
+          // console.log(assignedTasks);
+          // console.log(depSubTask);
+          // console.log(depSubTask.subtask);
+          // console.log(prevDep[0]);
 
           return {
             ...clientTask,
@@ -167,12 +229,10 @@ export const AppProvider = ({ children }) => {
               {
                 ...assignedTasks[0],
                 depTasks: [
+                  prevDep[0],
                   {
-                    ...assignedTasks[0].depTasks[0],
-                    subtask: [
-                      ...remainingTasks[0].subtask,
-                      { ...task.subtask[0] },
-                    ],
+                    ...depSubTask,
+                    subtask: [...depSubTask.subtask, { ...task.subtask[0] }],
                   },
                 ],
               },
@@ -184,7 +244,15 @@ export const AppProvider = ({ children }) => {
             info: [
               {
                 ...assignedTasks[0],
-                subtask: [...remainingTasks, { ...task.subtask[0] }],
+                depTasks: [
+                  {
+                    ...assignedTasks[0].depTasks[0],
+                    subtask: [
+                      ...remainingTasks[0].subtask,
+                      { ...task.subtask[0] },
+                    ],
+                  },
+                ],
               },
             ],
           };
@@ -223,9 +291,49 @@ export const AppProvider = ({ children }) => {
           .map((each) => each)
           .find((a) => a === unique);
         const index = finalTask.info.indexOf(match);
+        const assignedTasks = curInfo.info
+          .flatMap((tasks) => tasks)
+          .filter((specific) => specific.task === submenuPage.task);
 
-        if (finalTask.info === curInfo.info && specificSub) {
-          const test = finalTask.info.filter((a) => a !== match);
+        const test = finalTask.info.filter((a) => a !== match);
+
+        const prevDep = assignedTasks.flatMap((val) => {
+          const { depTasks } = val;
+          return depTasks.filter((each) => each.id !== depSubTask.id);
+        });
+        if (
+          finalTask.info === curInfo.info &&
+          finalTask.info[index].depTasks.length > 1 &&
+          depSubTask.subtask.length > 1
+        ) {
+          const subIndex = specificSub
+            .map((each) => {
+              return each;
+            })
+            .filter((val) => val === match.depTasks[0])
+            .flatMap((val) => {
+              const { subtask } = val;
+              return subtask.find((del) => del !== differentSub[0]);
+            })
+            .filter((finalVal) => typeof finalVal !== "undefined");
+
+          return {
+            ...finalTask,
+            info: [
+              ...test,
+              {
+                ...finalTask.info[index],
+                depTasks: [
+                  prevDep[0],
+                  {
+                    ...depSubTask,
+                    subtask: [...subIndex, { ...task.subtask[0] }],
+                  },
+                ],
+              },
+            ],
+          };
+        } else if (finalTask === curInfo && depSubTask.subtask.length > 1) {
           const subIndex = specificSub
             .map((each) => {
               return each;
@@ -252,15 +360,20 @@ export const AppProvider = ({ children }) => {
               },
             ],
           };
-        } else if (finalTask === curInfo) {
+        } else if (
+          finalTask.info === curInfo.info &&
+          depSubTask.subtask.length === 1
+        ) {
           return {
             ...finalTask,
             info: [
+              ...test,
               {
                 ...finalTask.info[index],
                 depTasks: [
+                  prevDep[0],
                   {
-                    ...finalTask.info[index].depTasks[0],
+                    ...depSubTask,
                     subtask: [{ ...task.subtask[0] }],
                   },
                 ],
@@ -283,8 +396,6 @@ export const AppProvider = ({ children }) => {
     const remainingTasks = submenuPage.depTasks
       .flatMap((sub) => sub.subtask)
       .filter((remain) => remain.id !== id);
-
-    console.log(remainingTasks);
 
     setSingleTask(
       singleTask.map((finalTask) => {
@@ -310,8 +421,9 @@ export const AppProvider = ({ children }) => {
         }
       })
     );
-    setShowSubtask(!showSubtask);
-    setIsSubmenuOpen(!isSubmenuOpen);
+    setShowSubtask(false);
+    setIsSubmenuOpen(false);
+    setShowTask(false);
   };
 
   const openSubmenu = (text, location) => {
@@ -352,13 +464,17 @@ export const AppProvider = ({ children }) => {
   const editBtn = (id) => {
     const editVal = singleTask
       .map((task) =>
-        task.info.map((item) => {
+        task.info.flatMap((item) => {
           const { depTasks } = item;
-          return depTasks[0].subtask.find((curId) => curId.id === id);
+
+          return depTasks.flatMap((val) =>
+            val.subtask.find((curId) => curId.id === id)
+          );
         })
       )
       .flatMap((val) => val)
-      .filter((filtered) => filtered);
+      .filter((filtered) => typeof filtered !== "undefined");
+
     setIsEditing(true);
     setEditingTask(editVal);
   };
@@ -394,6 +510,9 @@ export const AppProvider = ({ children }) => {
         depSubtasks,
         depSubTask,
         setDepSubTask,
+        addingDep,
+        setAddingDep,
+        addDep,
       }}
     >
       {children}
