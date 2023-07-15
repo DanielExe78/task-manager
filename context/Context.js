@@ -137,6 +137,8 @@ export const AppProvider = ({ children }) => {
     },
   ]);
 
+  console.log(singleTask);
+
   const addedTask = (task) => {
     const curInfo = singleTask.find((item) => item.info === page.info);
     setSingleTask(
@@ -212,15 +214,6 @@ export const AppProvider = ({ children }) => {
             const { depTasks } = val;
             return depTasks.filter((each) => each.id !== depSubTask.id);
           });
-
-          // console.log(unmodifiedVal);
-          // console.log(remainingTasks);
-          // console.log(remainingTasks[0]);
-          // console.log(remainingTasks[1]);
-          // console.log(assignedTasks);
-          // console.log(depSubTask);
-          // console.log(depSubTask.subtask);
-          // console.log(prevDep[0]);
 
           return {
             ...clientTask,
