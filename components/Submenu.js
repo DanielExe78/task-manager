@@ -1,15 +1,16 @@
 import React, { useState } from "react";
 import { useGlobalContext } from "../context/Context";
 import Subtask from "./Subtask";
+import MainTasks from "./MainTasks";
 
 const Submenu = () => {
   const {
     isSubmenuOpen,
     isModalOpen,
     setIsModalOpen,
-    setShowSubtask,
-    showSubtask,
     openSubtaskMenu,
+    showTask,
+    setShowTask,
     page: { info },
   } = useGlobalContext();
 
@@ -17,8 +18,9 @@ const Submenu = () => {
     const text = e.target.textContent;
     const tempBtn = e.target.getBoundingClientRect();
     const center = (tempBtn.bottom + tempBtn.top) / 2;
-    openSubtaskMenu(text, center);
-    setShowSubtask(!showSubtask);
+    const id = e.currentTarget.id;
+    openSubtaskMenu(text, id);
+    setShowTask(!showTask);
   };
 
   return (
@@ -31,6 +33,7 @@ const Submenu = () => {
               return (
                 <button
                   key={id}
+                  id={id}
                   className="bg-[#FFFFFF] text-black rounded"
                   onClick={displaySubTask}
                 >
@@ -40,7 +43,7 @@ const Submenu = () => {
             })}
           </ul>
           <section className="absolute left-40 bottom-0">
-            <Subtask />
+            <MainTasks />
           </section>
           <button
             onClick={() => setIsModalOpen(!isModalOpen)}

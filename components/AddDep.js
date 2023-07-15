@@ -1,13 +1,12 @@
-"use client";
 import React, { useState } from "react";
-import { useGlobalContext } from "../context/Context";
 import { v4 as uuidv4 } from "uuid";
+import { useGlobalContext } from "../context/Context";
 
-const FormComponent = () => {
-  const { setIsModalOpen, addedTask, setShowSubtask } = useGlobalContext();
-  const [tasks, setTasks] = useState([
+const AddDep = () => {
+  const { setIsModalOpen, setShowSubtask, addDep, addingDep, setAddingDep } =
+    useGlobalContext();
+  const [addDepartment, setAddDepartment] = useState([
     {
-      task: "",
       depTasks: [
         {
           department: "",
@@ -23,34 +22,24 @@ const FormComponent = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (tasks.task) {
-      const newTask = {
-        ...tasks,
-        id: uuidv4(),
-        depTasks: [...tasks.depTasks],
-      };
-      addedTask(newTask);
-      setShowSubtask(false);
-      setIsModalOpen(false);
-    }
-  };
 
-  const handleTask = (e) => {
-    let name = e.target.name;
-    let value = e.target.value;
+    const newDep = {
+      ...addDepartment.depTasks[0],
+      subtask: [{ ...addDepartment.subtask[0] }],
+    };
 
-    setTasks({
-      ...tasks,
-      [name]: value,
-    });
+    addDep(newDep);
+    setShowSubtask(false);
+    setIsModalOpen(false);
+    setAddingDep(false);
   };
 
   const handleDep = (e) => {
     let name = e.target.name;
     let value = e.target.value;
 
-    setTasks({
-      ...tasks,
+    setAddDepartment({
+      ...addDepartment,
       depTasks: [
         {
           id: uuidv4(),
@@ -64,17 +53,12 @@ const FormComponent = () => {
     let name = e.target.name;
     let value = e.target.value;
 
-    setTasks({
-      ...tasks,
-      depTasks: [
+    setAddDepartment({
+      ...addDepartment,
+      subtask: [
         {
-          ...tasks.depTasks[0],
-          subtask: [
-            {
-              id: uuidv4(),
-              [name]: value,
-            },
-          ],
+          id: uuidv4(),
+          [name]: value,
         },
       ],
     });
@@ -85,24 +69,11 @@ const FormComponent = () => {
       <div className="flex flex-col">
         <input
           type="text"
-          placeholder="Tarea Principal"
-          name="task"
-          onChange={handleTask}
-          className="border-b-2 border-b-gray-600 focus:outline-none placeholder:text-slate-400 "
-        />
-      </div>
-
-      <div className="flex flex-col">
-        <input
-          type="text"
           placeholder="Departamento"
           name="department"
           onChange={handleDep}
           className="border-b-2 border-b-gray-600 focus:outline-none placeholder:text-slate-400 "
         />
-      </div>
-
-      <div className="flex flex-col">
         <input
           type="text"
           placeholder="Subtarea"
@@ -116,10 +87,10 @@ const FormComponent = () => {
         className="rounded bg-cyan-400 uppercase inline-block shadow-black hover:bg-cyan-500 p-1 mt-1 w-fit self-center"
         onClick={handleSubmit}
       >
-        add task
+        ADD
       </button>
     </form>
   );
 };
 
-export default FormComponent;
+export default AddDep;
