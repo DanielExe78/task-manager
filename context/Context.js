@@ -137,6 +137,9 @@ export const AppProvider = ({ children }) => {
     },
   ]);
 
+    console.log(singleTask);
+
+  
   const addedTask = (task) => {
     const curInfo = singleTask.find((item) => item.info === page.info);
     setSingleTask(
