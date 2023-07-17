@@ -137,7 +137,7 @@ export const AppProvider = ({ children }) => {
     },
   ]);
 
-  console.log(singleTask);
+  // console.log(singleTask);
 
   const addedTask = (task) => {
     const curInfo = singleTask.find((item) => item.info === page.info);
@@ -472,6 +472,34 @@ export const AppProvider = ({ children }) => {
     setEditingTask(editVal);
   };
 
+  const delCompleteTask = (id) => {
+    const curInfo = singleTask.filter((client) => client.info === page.info);
+    const assignedTasks = curInfo
+      .flatMap((tasks) => tasks.info)
+      .filter((each) => each !== submenuPage);
+    const remainingTasks = curInfo.flatMap((sub) =>
+      sub.info.filter((val) => val.id !== id)
+    );
+
+    // console.log(assignedTasks);
+    console.log(...remainingTasks);
+    // console.log(curInfo);
+
+    setSingleTask(
+      singleTask.map((finalTask) => {
+        const { info } = finalTask;
+
+        return {
+          ...finalTask,
+          info: [...remainingTasks],
+        };
+      })
+    );
+    setShowSubtask(false);
+    setIsSubmenuOpen(false);
+    setShowTask(false);
+  };
+
   return (
     <TaskContext.Provider
       value={{
@@ -506,6 +534,7 @@ export const AppProvider = ({ children }) => {
         addingDep,
         setAddingDep,
         addDep,
+        delCompleteTask,
       }}
     >
       {children}
