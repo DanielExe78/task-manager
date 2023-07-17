@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useGlobalContext } from "../context/Context";
-import Subtask from "./Subtask";
 import MainTasks from "./MainTasks";
+import { TiDelete } from "react-icons/ti";
 
 const Submenu = () => {
   const {
@@ -10,6 +10,7 @@ const Submenu = () => {
     setIsModalOpen,
     openSubtaskMenu,
     showTask,
+    delCompleteTask,
     setShowTask,
     page: { info },
   } = useGlobalContext();
@@ -23,22 +24,31 @@ const Submenu = () => {
     setShowTask(!showTask);
   };
 
+  const handleDelete = (id) => {
+    delCompleteTask(id);
+  };
+
   return (
     <>
       {isSubmenuOpen && (
-        <aside className="bg-[#EAEAEA] rounded p-5 relative">
+        <aside className="bg-[#EAEAEA] rounded p-4 relative">
           <ul className="flex flex-col gap-2">
             {info.map((item) => {
               const { task, id } = item;
               return (
-                <button
-                  key={id}
-                  id={id}
-                  className="bg-[#FFFFFF] text-black rounded"
-                  onClick={displaySubTask}
-                >
-                  <li>{task}</li>
-                </button>
+                <div className="flex gap-2" key={id}>
+                  <button
+                    key={id}
+                    id={id}
+                    className="bg-[#FFFFFF] text-black rounded w-24"
+                    onClick={displaySubTask}
+                  >
+                    <li>{task}</li>
+                  </button>
+                  <button onClick={() => handleDelete(id)}>
+                    <TiDelete className="fill-red-800" />
+                  </button>
+                </div>
               );
             })}
           </ul>

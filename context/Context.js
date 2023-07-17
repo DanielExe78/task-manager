@@ -137,9 +137,6 @@ export const AppProvider = ({ children }) => {
     },
   ]);
 
-    console.log(singleTask);
-
-  
   const addedTask = (task) => {
     const curInfo = singleTask.find((item) => item.info === page.info);
     setSingleTask(
@@ -215,15 +212,6 @@ export const AppProvider = ({ children }) => {
             const { depTasks } = val;
             return depTasks.filter((each) => each.id !== depSubTask.id);
           });
-
-          // console.log(unmodifiedVal);
-          // console.log(remainingTasks);
-          // console.log(remainingTasks[0]);
-          // console.log(remainingTasks[1]);
-          // console.log(assignedTasks);
-          // console.log(depSubTask);
-          // console.log(depSubTask.subtask);
-          // console.log(prevDep[0]);
 
           return {
             ...clientTask,
@@ -482,6 +470,28 @@ export const AppProvider = ({ children }) => {
     setEditingTask(editVal);
   };
 
+  const delCompleteTask = (id) => {
+    const curInfo = singleTask.filter((client) => client.info === page.info);
+    const assignedTasks = curInfo
+      .flatMap((tasks) => tasks.info)
+      .filter((each) => each !== submenuPage);
+    const remainingTasks = curInfo.flatMap((sub) =>
+      sub.info.filter((val) => val.id !== id)
+    );
+
+    setSingleTask(
+      singleTask.map((finalTask) => {
+        return {
+          ...finalTask,
+          info: [...remainingTasks],
+        };
+      })
+    );
+    setShowSubtask(false);
+    setIsSubmenuOpen(false);
+    setShowTask(false);
+  };
+
   return (
     <TaskContext.Provider
       value={{
@@ -516,6 +526,7 @@ export const AppProvider = ({ children }) => {
         addingDep,
         setAddingDep,
         addDep,
+        delCompleteTask,
       }}
     >
       {children}
